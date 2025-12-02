@@ -17,7 +17,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold tracking-tight">Contribution</h2>
           </div>
-          <div className="rounded-xl border bg-card p-4 shadow-sm overflow-hidden">
+          <div className="overflow-hidden">
             <Heatmap />
           </div>
         </section>

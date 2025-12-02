@@ -75,33 +75,7 @@ export function Heatmap() {
     return (
         <div className="w-full overflow-x-auto p-4 bg-[#0d1117] rounded-md border border-[#30363d]">
             <div className="min-w-max flex flex-col gap-2">
-                {/* Month Labels */}
-                <div className="flex text-[11px] text-[#7d8590] ml-8 mb-2 relative h-4">
-                    {months.map((month, i) => (
-                        <span
-                            key={i}
-                            style={{
-                                position: 'absolute',
-                                left: `${month.weekIndex * 14}px` // 10px width + 4px gap approx
-                            }}
-                        >
-                            {month.name}
-                        </span>
-                    ))}
-                </div>
-
                 <div className="flex gap-2">
-                    {/* Day Labels */}
-                    <div className="flex flex-col gap-[3px] text-[11px] text-[#7d8590] pt-[15px] pr-2">
-                        <span className="h-[10px] leading-[10px] opacity-0">Sun</span>
-                        <span className="h-[10px] leading-[10px]">Mon</span>
-                        <span className="h-[10px] leading-[10px] opacity-0">Tue</span>
-                        <span className="h-[10px] leading-[10px]">Wed</span>
-                        <span className="h-[10px] leading-[10px] opacity-0">Thu</span>
-                        <span className="h-[10px] leading-[10px]">Fri</span>
-                        <span className="h-[10px] leading-[10px] opacity-0">Sat</span>
-                    </div>
-
                     {/* Grid */}
                     <TooltipProvider>
                         <div className="flex gap-[3px]">
@@ -129,7 +103,7 @@ export function Heatmap() {
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between mt-4 text-xs text-[#7d8590]">
+                <div className="flex items-center justify-between mt-2 text-xs text-[#7d8590]">
                     <a href="#" className="hover:text-[#58a6ff] hover:underline">Learn how we count contributions</a>
                     <div className="flex items-center gap-1">
                         <span>Less</span>
