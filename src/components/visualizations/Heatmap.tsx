@@ -31,7 +31,7 @@ export function Heatmap() {
     if (currentWeek.length) weeks.push(currentWeek)
 
     const getColor = (count: number) => {
-        if (count === 0) return "bg-muted/40"
+        if (count === 0) return "bg-muted"
         if (count === 1) return "bg-primary/30"
         if (count === 2) return "bg-primary/50"
         if (count === 3) return "bg-primary/70"
