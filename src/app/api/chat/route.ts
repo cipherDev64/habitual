@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const { messages } = await req.json();
 
@@ -28,12 +28,12 @@ export async function POST(req: Request) {
     // For simplicity in this iteration, we'll construct a prompt from the history
     // or just pass the last user message. A better approach for multi-turn is to use
     // startChat, but let's start simple.
-    
+
     const chat = model.startChat({
-        history: messages.slice(0, -1).map(m => ({
-            role: m.role === 'user' ? 'user' : 'model',
-            parts: [{ text: m.content }],
-        }))
+      history: messages.slice(0, -1).map(m => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.content }],
+      }))
     });
 
     const lastMessage = messages[messages.length - 1];
