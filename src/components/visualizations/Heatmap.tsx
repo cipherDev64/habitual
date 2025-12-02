@@ -15,23 +15,44 @@ import { parseISO, format } from 'date-fns'
 
 export function Heatmap() {
     const { logs } = useHabits()
-    const data = getHeatmapData(logs, 364) // 52 weeks * 7 days = 364
 
-    // Group by weeks
-    const weeks: typeof data[] = []
-    let currentWeek: typeof data = []
+    // Generate full year of data
+    const today = new Date()
+    const endDate = today
+    const startDate = new Date(today)
+    startDate.setDate(today.getDate() - 364) // 52 weeks
 
-    data.forEach((day, index) => {
-        if (index % 7 === 0 && currentWeek.length) {
-            weeks.push(currentWeek)
-            currentWeek = []
+    // Adjust start date to be a Sunday to align columns properly
+    const dayOfWeek = startDate.getDay()
+    if (dayOfWeek !== 0) {
+        startDate.setDate(startDate.getDate() - dayOfWeek)
+    }
+
+    const data = getHeatmapData(logs, 365) // Get enough data
+
+    // Map data to a map for easy lookup
+    const dataMap = new Map(data.map(d => [d.date, d]))
+
+    // Generate weeks
+    const weeks: { date: string; count: number }[][] = []
+    let currentWeek: { date: string; count: number }[] = []
+
+    let currentDate = new Date(startDate)
+
+    // Generate exactly 53 weeks to cover the year fully
+    for (let w = 0; w < 53; w++) {
+        for (let d = 0; d < 7; d++) {
+            const dateStr = format(currentDate, 'yyyy-MM-dd')
+            const dayData = dataMap.get(dateStr) || { date: dateStr, count: 0, dayOfWeek: d }
+            currentWeek.push({ date: dateStr, count: dayData.count })
+            currentDate.setDate(currentDate.getDate() + 1)
         }
-        currentWeek.push(day)
-    })
-    if (currentWeek.length) weeks.push(currentWeek)
+        weeks.push(currentWeek)
+        currentWeek = []
+    }
 
     const getColor = (count: number) => {
-        if (count === 0) return "bg-muted"
+        if (count === 0) return "bg-muted hover:bg-muted/80"
         if (count === 1) return "bg-primary/30"
         if (count === 2) return "bg-primary/50"
         if (count === 3) return "bg-primary/70"
@@ -50,13 +71,14 @@ export function Heatmap() {
                                         <TooltipTrigger asChild>
                                             <div
                                                 className={cn(
-                                                    "h-3 w-3 rounded-sm transition-colors hover:ring-1 hover:ring-ring cursor-default",
+                                                    "h-3 w-3 rounded-sm transition-colors cursor-default border border-transparent",
+                                                    day.count === 0 && "border-border/50", // Add border for empty cells for better visibility
                                                     getColor(day.count)
                                                 )}
                                             />
                                         </TooltipTrigger>
                                         <TooltipContent>
-                                            <p>{day.date}: {day.count} completed</p>
+                                            <p className="text-xs">{day.date}: {day.count} completed</p>
                                         </TooltipContent>
                                     </Tooltip>
                                 ))}
