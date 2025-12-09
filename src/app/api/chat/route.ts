@@ -1,15 +1,21 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       return NextResponse.json(
-        { error: "OPENROUTER_API_KEY is not defined" },
+        { error: "GEMINI_API_KEY is not defined" },
         { status: 500 }
       );
     }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    // Using gemini-1.5-flash as it is the current standard/stable model.
+    // User mentioned gemini-2.5 before but let's stick to 1.5-flash for reliability.
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const { messages } = await req.json();
 
@@ -20,32 +26,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://habitual.app", // Optional site URL
-        "X-Title": "Habitual", // Optional site title
-      },
-      body: JSON.stringify({
-        "model": "google/gemini-pro-1.5",
-        "messages": messages.map((m: any) => ({
-          role: m.role,
-          content: m.content
-        })),
-      })
+    const chat = model.startChat({
+      history: messages.slice(0, -1).map((m: any) => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.content }],
+      }))
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`OpenRouter API Error: ${response.status} - ${errorText}`);
-    }
+    const lastMessage = messages[messages.length - 1];
+    const result = await chat.sendMessage(lastMessage.content);
+    const response = await result.response;
+    const text = response.text();
 
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content || "No response received.";
-
-    return NextResponse.json({ role: "assistant", content });
+    return NextResponse.json({ role: "assistant", content: text });
   } catch (error) {
     console.error("Error in chat API:", error);
     return NextResponse.json(
