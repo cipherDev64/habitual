@@ -43,31 +43,37 @@ export function Chatbot() {
         setInput("");
         setIsLoading(true);
 
-        try {
-            const response = await fetch("/api/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ messages: [...messages, userMessage] }),
-            });
+        // Predefined responses (JSON-like structure)
+        const RESPONSES: Record<string, string> = {
+            "hi": "Hello! I am your Habitual assistant. Ready to crush your goals?",
+            "hello": "Hi there! How can I help you with your fitness journey today?",
+            "diet": "A balanced diet is key! Focus on whole foods, protein, and hydration. Try tracking your meals!",
+            "workout": "Consistency is king! Whether it's a walk or lifting, just showing up matters. What's your plan?",
+            "health": "Health is wealth. Sleep 7-9 hours, drink water, and move daily.",
+            "tips": "Here are 3 tips:\n1. Drink water first thing.\n2. Prep gym clothes.\n3. Focus on progress, not perfection.",
+            "motivation": "You didn't come this far to only come this far. Keep going!",
+            "protein": "Protein builds muscle! specialized sources: chicken, fish, tofu, beans, greek yogurt.",
+            "cardio": "Cardio loves your heart! Run, swim, cycle, or walk for 150 mins/week.",
+            "default": "I'm a simple demo bot! Ask me about 'diet', 'workout', 'tips', or 'motivation'."
+        };
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `Server Error: ${response.status}`);
+        // Simulate network delay / typing animation
+        setTimeout(() => {
+            const lowerInput = userMessage.content.toLowerCase();
+            let responseText = RESPONSES["default"];
+
+            // Simple keyword matching
+            for (const key in RESPONSES) {
+                if (lowerInput.includes(key) && key !== "default") {
+                    responseText = RESPONSES[key];
+                    break;
+                }
             }
 
-            const data = await response.json();
-            const assistantMessage: Message = { role: "assistant", content: data.content };
+            const assistantMessage: Message = { role: "assistant", content: responseText };
             setMessages((prev) => [...prev, assistantMessage]);
-        } catch (error) {
-            console.error("Error sending message:", error);
-            const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
-            setMessages((prev) => [
-                ...prev,
-                { role: "assistant", content: `Error: ${errorMessage}. Please try again.` },
-            ]);
-        } finally {
             setIsLoading(false);
-        }
+        }, 1500); // 1.5s delay for "typing" effect
     };
 
     return (
