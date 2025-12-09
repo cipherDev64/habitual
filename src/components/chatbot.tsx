@@ -50,16 +50,20 @@ export function Chatbot() {
                 body: JSON.stringify({ messages: [...messages, userMessage] }),
             });
 
-            if (!response.ok) throw new Error("Failed to fetch response");
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `Server Error: ${response.status}`);
+            }
 
             const data = await response.json();
             const assistantMessage: Message = { role: "assistant", content: data.content };
             setMessages((prev) => [...prev, assistantMessage]);
         } catch (error) {
             console.error("Error sending message:", error);
+            const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
             setMessages((prev) => [
                 ...prev,
-                { role: "assistant", content: "Sorry, I encountered an error. Please try again." },
+                { role: "assistant", content: `Error: ${errorMessage}. Please try again.` },
             ]);
         } finally {
             setIsLoading(false);
