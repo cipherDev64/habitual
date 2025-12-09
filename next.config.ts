@@ -8,8 +8,6 @@ const withPWA = require("next-pwa")({
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // @ts-ignore - Turbopack type definition might not be in older types, but valid in Next 16
-  turbopack: {},
 };
 
 export default withPWA(nextConfig);
