@@ -43,7 +43,6 @@ export default function RootLayout({
             <Chatbot />
           </HabitProvider>
         </ThemeProvider>
-        <Script src="https://js.puter.com/v2/" strategy="afterInteractive" />
       </body>
     </html>
   );
