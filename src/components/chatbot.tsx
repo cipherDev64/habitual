@@ -58,6 +58,8 @@ export function Chatbot() {
         };
 
         // Simulate network delay / typing animation
+        /* 
+        // DISABLED MOCK RESPONSE - Using Local Llama
         setTimeout(() => {
             const lowerInput = userMessage.content.toLowerCase();
             let responseText = RESPONSES["default"];
@@ -74,6 +76,14 @@ export function Chatbot() {
             setMessages((prev) => [...prev, assistantMessage]);
             setIsLoading(false);
         }, 1500); // 1.5s delay for "typing" effect
+        */
+
+        // Clear loading state after a slight delay if needed, 
+        // but strictly Llama will handle the response via DOM injection.
+        // However, React state 'isLoading' keeps the spinner.
+        // We should let Llama finish, but we don't have a callback back to React easily here.
+        // For now, let's just clear isLoading after 1s so the spinner doesn't get stuck forever if Llama fails.
+        setTimeout(() => setIsLoading(false), 2000);
     };
 
     return (
@@ -104,7 +114,7 @@ export function Chatbot() {
                             </CardHeader>
                             <CardContent className="p-0">
                                 <ScrollArea className="h-[400px] p-4" ref={scrollRef}>
-                                    <div className="flex flex-col gap-4">
+                                    <div id="chat-container" className="flex flex-col gap-4">
                                         {messages.length === 0 && (
                                             <div className="text-center text-muted-foreground py-8 px-4">
                                                 <p className="text-sm">Hi! I'm your personal health assistant.</p>
@@ -124,6 +134,8 @@ export function Chatbot() {
                                                 {msg.content}
                                             </div>
                                         ))}
+                                        {/* Llama text will be appended here by DOM manipulation */}
+
                                         {isLoading && (
                                             <div className="flex w-max max-w-[80%] flex-col gap-2 rounded-lg px-3 py-2 text-sm bg-muted">
                                                 <div className="flex items-center gap-2">
@@ -136,7 +148,7 @@ export function Chatbot() {
                                 </ScrollArea>
                             </CardContent>
                             <CardFooter className="p-3 border-t bg-muted/10">
-                                <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
+                                <form id="chat-form" onSubmit={handleSubmit} className="flex w-full items-center gap-2">
                                     <Input
                                         ref={inputRef}
                                         placeholder="Type your message..."

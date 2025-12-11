@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { HabitProvider } from "@/context/HabitContext";
 import { Chatbot } from "@/components/chatbot";
+import { LlamaIntegration } from "@/llama/LlamaIntegration";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,6 +34,7 @@ export default function RootLayout({
           <HabitProvider>
             {children}
             <Chatbot />
+            <LlamaIntegration />
           </HabitProvider>
         </ThemeProvider>
       </body>
